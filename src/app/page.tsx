@@ -74,7 +74,8 @@ export default function Home() {
             <div className="red-rule mx-auto mb-10" />
           </div>
           <h1 className="animate-fade-up delay-2 text-center text-[clamp(4rem,12vw,11rem)] font-light leading-[0.85] tracking-[-0.03em] text-foreground font-display">
-            climbing cat
+            climbing{" "}
+            <span className="bg-accent px-[0.1em] text-white">cat</span>
           </h1>
         </div>
 
@@ -82,16 +83,16 @@ export default function Home() {
 
         {/* Tagline + credits */}
         <div className="mb-[12vh] flex flex-col items-center">
-          <p className="animate-fade-up delay-3 text-[11px] font-light tracking-[0.25em] uppercase text-muted">
+          <p className="animate-fade-up delay-3 text-[24px] font-light tracking-[0.25em] uppercase text-muted">
             building apps that land on their feet
           </p>
 
           <div className="animate-fade-up delay-4 mt-4 flex flex-col items-center gap-2 md:flex-row md:gap-6">
-            <span className="text-[11px] font-light tracking-[0.15em] text-muted">
+            <span className="text-[24px] font-light tracking-[0.15em] text-muted">
               by{" "}
-              <a href="https://www.linkedin.com/in/martin-leung/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">Martin Leung</a>
+              <a href="https://www.linkedin.com/in/martin-leung/" target="_blank" rel="noopener noreferrer" className="underline decoration-accent transition-colors hover:text-accent">Martin Leung</a>
               {" & "}
-              <a href="https://www.linkedin.com/in/nathanksou/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">Nathan Sou</a>
+              <a href="https://www.linkedin.com/in/nathanksou/" target="_blank" rel="noopener noreferrer" className="underline decoration-accent transition-colors hover:text-accent">Nathan Sou</a>
             </span>
           </div>
         </div>
