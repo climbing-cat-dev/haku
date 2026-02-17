@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #f8f7f4;
+  --color-foreground: #111111;
+  --color-accent: #E8611A;
+  --color-muted: #999999;
+  --color-border: #e0ddd8;
+  --font-family-display: var(--font-display);
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: white;
+  }
+}
+
+@layer components {
+  /* Gallery image placeholders */
+  .gallery-item {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .gallery-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 60%
+    );
+  }
+
+  .gallery-item:hover {
+    transform: scale(0.985);
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+  }
+
+  /* Stagger delays */
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.35s; }
+  .delay-4 { animation-delay: 0.5s; }
+  .delay-5 { animation-delay: 0.65s; }
+  .delay-6 { animation-delay: 0.8s; }
+  .delay-7 { animation-delay: 0.95s; }
+
+  /* Thin red rule */
+  .red-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--color-accent);
+  }
+
+  /* Horizontal scroll line */
+  @keyframes expandLine {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  .line-expand {
+    animation: expandLine 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation-delay: 0.6s;
+    width: 0;
+    height: 1px;
+    background: var(--color-border);
+  }
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+    opacity: 1;
+  }
+  .line-expand {
+    animation: none;
+    width: 100%;
+  }
+  .gallery-item:hover {
+    transform: none;
+    transition: none;
+  }
+}
