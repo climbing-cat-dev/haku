@@ -90,9 +90,9 @@ export default function Home() {
           <div className="animate-fade-up delay-4 mt-4 flex flex-col items-center gap-2 md:flex-row md:gap-6">
             <span className="text-[24px] font-light tracking-[0.15em] text-muted">
               by{" "}
-              <a href="https://www.linkedin.com/in/martin-leung/" target="_blank" rel="noopener noreferrer" className="underline decoration-accent transition-colors hover:text-accent">Martin Leung</a>
+              <a href="https://www.linkedin.com/in/martin-leung/" target="_blank" rel="noopener noreferrer" className="text-accent transition-all hover:underline hover:decoration-accent">Martin Leung</a>
               {" & "}
-              <a href="https://www.linkedin.com/in/nathanksou/" target="_blank" rel="noopener noreferrer" className="underline decoration-accent transition-colors hover:text-accent">Nathan Sou</a>
+              <a href="https://www.linkedin.com/in/nathanksou/" target="_blank" rel="noopener noreferrer" className="text-accent transition-all hover:underline hover:decoration-accent">Nathan Sou</a>
             </span>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default function Home() {
         {/* Scroll-down arrow */}
         <button
           onClick={() => scrollToSection("gallery")}
-          className="animate-fade-up delay-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-muted transition-all duration-300 hover:border-accent hover:text-accent"
+          className="animate-fade-up delay-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-accent transition-all duration-300 hover:border-accent"
           aria-label="Scroll to gallery"
         >
           <ArrowIcon direction="down" />
@@ -146,7 +146,7 @@ export default function Home() {
       {/* Back to top */}
       <button
         onClick={() => scrollToSection("top")}
-        className={`fixed bottom-6 right-6 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-muted transition-all duration-300 hover:border-accent hover:text-accent ${
+        className={`fixed bottom-6 right-6 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-accent transition-all duration-300 hover:border-accent ${
           showBackToTop
             ? "translate-y-0 opacity-100"
             : "translate-y-4 opacity-0 pointer-events-none"
