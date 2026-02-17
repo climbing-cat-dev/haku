@@ -88,7 +88,10 @@ export default function Home() {
 
           <div className="animate-fade-up delay-4 mt-4 flex flex-col items-center gap-2 md:flex-row md:gap-6">
             <span className="text-[11px] font-light tracking-[0.15em] text-muted">
-              by Martin Leung & Nathan Sou
+              by{" "}
+              <a href="https://www.linkedin.com/in/martin-leung/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">Martin Leung</a>
+              {" & "}
+              <a href="https://www.linkedin.com/in/nathanksou/" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-accent">Nathan Sou</a>
             </span>
           </div>
         </div>
