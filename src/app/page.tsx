@@ -268,7 +268,7 @@ export default function Home() {
       {/* Projects */}
       <section id="projects" className="px-6 py-12 md:px-10 md:py-16">
         <div className="animate-fade-up delay-3 mb-10">
-          <h2 className="mt-3 text-[clamp(2rem,5vw,4rem)] font-light leading-[1.1] tracking-[-0.02em] font-display">
+          <h2 className="mt-3 text-[clamp(2rem,5vw,4rem)] font-light leading-[1.1] tracking-[-0.02em] font-display text-center">
             projects
           </h2>
         </div>
