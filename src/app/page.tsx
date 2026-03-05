@@ -1,25 +1,173 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
-const GALLERY_ITEMS = [
-  { id: "haku-resting", label: "Haku resting", aspect: "aspect-[4/3]", bg: "bg-[#ddd8d0]", span: "col-span-12 md:col-span-7", delay: "delay-3" },
-  { id: "portrait", label: "Portrait", aspect: "aspect-[3/4]", bg: "bg-[#e2dfd9]", span: "col-span-12 md:col-span-5", delay: "delay-4" },
-  { id: "exploring", label: "Exploring", aspect: "aspect-square", bg: "bg-[#d5d2cc]", span: "col-span-6 md:col-span-4", delay: "delay-5" },
-  { id: "sunlight", label: "Sunlight", aspect: "aspect-square", bg: "bg-[#e8e5df]", span: "col-span-6 md:col-span-4", delay: "delay-6" },
-  { id: "window", label: "Window", aspect: "aspect-[4/3]", bg: "bg-[#dbd7d1]", span: "col-span-12 md:col-span-4", delay: "delay-7" },
-  { id: "panoramic", label: "Panoramic", aspect: "aspect-[21/9]", bg: "bg-[#e0dcd6]", span: "col-span-12", delay: "delay-7" },
-] as const;
-
-function GalleryItem({ label, aspect, bg, span, delay }: Omit<(typeof GALLERY_ITEMS)[number], "id">) {
-  return (
-    <div className={`animate-fade-up ${delay} ${span}`}>
-      <div className={`gallery-item ${aspect} rounded-sm ${bg} transition-transform duration-500`}>
-        <div className="flex h-full items-center justify-center">
-          <span className="text-[10px] tracking-[0.3em] uppercase text-[#bbb5ab]">
-            {label}
+function ProjectCard({ href, image, title, description, subtitle, delay, onClick }: {
+  href?: string;
+  image?: string;
+  title: string;
+  description: string;
+  subtitle: string;
+  delay: string;
+  onClick?: () => void;
+}) {
+  const content = (
+    <>
+      <div className="gallery-item rounded-sm bg-[#e0dcd6] transition-transform duration-500 overflow-hidden">
+        {image ? (
+          <Image
+            src={image}
+            alt={title}
+            width={688}
+            height={384}
+            className="block w-full h-auto"
+          />
+        ) : (
+          <div className="aspect-[16/9] flex items-center justify-center">
+            <span className="text-[10px] tracking-[0.3em] uppercase text-[#bbb5ab]">
+              {title}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="mt-3">
+        <div className="flex items-baseline justify-between gap-2">
+          <h3 className="text-[clamp(1.1rem,2.5vw,1.4rem)] font-light tracking-[-0.01em] font-display">
+            {title}
+          </h3>
+          <span className="text-[10px] tracking-[0.15em] uppercase text-muted font-light group-hover:text-accent transition-colors whitespace-nowrap flex items-center gap-1">
+            {subtitle}
+            <span className="text-[0.9em]">↗</span>
           </span>
         </div>
+        <p className="mt-0.5 text-[12px] font-light tracking-[0.05em] text-muted">
+          {description}
+        </p>
+      </div>
+    </>
+  );
+
+  return (
+    <div className={`animate-fade-up ${delay}`}>
+      {href ? (
+        <a href={href} target={href.startsWith("mailto:") ? undefined : "_blank"} rel="noopener noreferrer" className="group block">
+          {content}
+        </a>
+      ) : onClick ? (
+        <button onClick={onClick} className="group block text-left w-full cursor-pointer">
+          {content}
+        </button>
+      ) : (
+        <div className="group block">{content}</div>
+      )}
+    </div>
+  );
+}
+
+function WaitlistModal({ onClose }: { onClose: () => void }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setStatus("success");
+      setTimeout(onClose, 2000);
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="relative w-full max-w-md mx-4 bg-background border border-border rounded-sm p-8 shadow-lg">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-muted hover:text-foreground transition-colors cursor-pointer"
+          aria-label="Close"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M1 1L13 13M13 1L1 13" stroke="currentColor" strokeWidth="0.75" />
+          </svg>
+        </button>
+
+        <h2 className="text-[clamp(1.5rem,4vw,2rem)] font-light tracking-[-0.02em] font-display mb-1">
+          Undertone
+        </h2>
+        <p className="text-[12px] font-light tracking-[0.05em] text-muted mb-6">
+          Join the waitlist to get early access.
+        </p>
+
+        {status === "success" ? (
+          <div className="py-8 text-center">
+            <p className="text-[clamp(1.1rem,2.5vw,1.4rem)] font-light font-display text-accent">
+              You&apos;re on the list
+            </p>
+            <p className="mt-2 text-[12px] font-light tracking-[0.05em] text-muted">
+              We&apos;ll be in touch soon.
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            {([
+              { type: "text", placeholder: "Name", value: name, onChange: setName },
+              { type: "email", placeholder: "Email", value: email, onChange: setEmail },
+            ] as const).map((field) => (
+              <input
+                key={field.placeholder}
+                type={field.type}
+                placeholder={field.placeholder}
+                value={field.value}
+                onChange={(e) => field.onChange(e.target.value)}
+                required
+                className="w-full border border-border bg-transparent px-3 py-2 text-[13px] font-light tracking-[0.02em] text-foreground placeholder:text-muted/60 outline-none focus:border-accent transition-colors rounded-sm"
+              />
+            ))}
+            {status === "error" && (
+              <p className="text-[11px] font-light tracking-[0.05em] text-red-500">
+                {errorMsg}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="w-full border border-accent bg-accent text-white py-2 text-[12px] font-light tracking-[0.15em] uppercase transition-all hover:bg-transparent hover:text-accent disabled:opacity-50 cursor-pointer rounded-sm"
+            >
+              {status === "loading" ? "Submitting..." : "Join Waitlist"}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
@@ -45,6 +193,7 @@ const SCROLL_THRESHOLD_RATIO = 0.5;
 
 export default function Home() {
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [showWaitlist, setShowWaitlist] = useState(false);
   const animationFrameRef = useRef(0);
 
   const onScroll = useCallback(() => {
@@ -101,9 +250,9 @@ export default function Home() {
 
         {/* Scroll-down arrow */}
         <button
-          onClick={() => scrollToSection("gallery")}
+          onClick={() => scrollToSection("projects")}
           className="animate-fade-up delay-5 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-background text-accent transition-all duration-300 hover:border-accent"
-          aria-label="Scroll to gallery"
+          aria-label="Scroll to projects"
         >
           <ArrowIcon direction="down" />
         </button>
@@ -116,18 +265,39 @@ export default function Home() {
         <div className="line-expand" />
       </div>
 
-      {/* Gallery */}
-      <section id="gallery" className="px-6 py-16 md:px-10 md:py-20">
-        <div className="animate-fade-up delay-3 mb-16">
+      {/* Projects */}
+      <section id="projects" className="px-6 py-12 md:px-10 md:py-16">
+        <div className="animate-fade-up delay-3 mb-10">
           <h2 className="mt-3 text-[clamp(2rem,5vw,4rem)] font-light leading-[1.1] tracking-[-0.02em] font-display">
-            gallery
+            projects
           </h2>
         </div>
 
-        <div className="grid grid-cols-12 gap-3 md:gap-4">
-          {GALLERY_ITEMS.map(({ id, ...item }) => (
-            <GalleryItem key={id} {...item} />
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <ProjectCard
+            href="mailto:nate@climbingcat.dev"
+            image="/climbing-cat.webp"
+            title="Climbing Cat"
+            description="An AI-native agency"
+            subtitle="contact us"
+            delay="delay-3"
+          />
+          <ProjectCard
+            href="https://hakus-playground.vercel.app"
+            image="/hakus-playground.webp"
+            title="Haku's Playground"
+            description="A playful guide to AI"
+            subtitle="learn more"
+            delay="delay-4"
+          />
+          <ProjectCard
+            image="/undertone.webp"
+            title="Undertone"
+            description="Your inner voice, illuminated"
+            subtitle="coming soon — join the waitlist"
+            delay="delay-5"
+            onClick={() => setShowWaitlist(true)}
+          />
         </div>
       </section>
 
@@ -155,6 +325,8 @@ export default function Home() {
       >
         <ArrowIcon direction="up" />
       </button>
+
+      {showWaitlist && <WaitlistModal onClose={() => setShowWaitlist(false)} />}
     </div>
   );
 }
