@@ -276,7 +276,7 @@ export default function Home() {
             delay="delay-3"
           />
           <ProjectCard
-            href="https://hakus-playground.vercel.app"
+            href="https://playground.climbingcat.dev"
             image="/hakus-playground.webp"
             title="Haku's Playground"
             description="A playful guide to AI"

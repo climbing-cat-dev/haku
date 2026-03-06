@@ -19,6 +19,9 @@ export const metadata: Metadata = {
   title: "climbing cat",
   description: "building apps that land on their feet",
   metadataBase: new URL("https://www.climbingcat.dev"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     title: "climbing cat",
     description: "building apps that land on their feet",
