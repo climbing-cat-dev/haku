@@ -66,7 +66,6 @@ function ProjectCard({ href, image, title, description, subtitle, delay, onClick
 }
 
 function WaitlistModal({ onClose }: { onClose: () => void }) {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -88,7 +87,7 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), email: email.trim() }),
+        body: JSON.stringify({ email: email.trim() }),
       });
 
       if (!res.ok) {
@@ -140,20 +139,14 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            {([
-              { type: "text", placeholder: "Name", value: name, onChange: setName },
-              { type: "email", placeholder: "Email", value: email, onChange: setEmail },
-            ] as const).map((field) => (
-              <input
-                key={field.placeholder}
-                type={field.type}
-                placeholder={field.placeholder}
-                value={field.value}
-                onChange={(e) => field.onChange(e.target.value)}
-                required
-                className="w-full border border-border bg-transparent px-3 py-2 text-[13px] font-light tracking-[0.02em] text-foreground placeholder:text-muted/60 outline-none focus:border-accent transition-colors rounded-sm"
-              />
-            ))}
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full border border-border bg-transparent px-3 py-2 text-[13px] font-light tracking-[0.02em] text-foreground placeholder:text-muted/60 outline-none focus:border-accent transition-colors rounded-sm"
+            />
             {status === "error" && (
               <p className="text-[11px] font-light tracking-[0.05em] text-red-500">
                 {errorMsg}

@@ -46,21 +46,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    const { name, email } = await request.json();
-
-    if (!isNonEmptyString(name)) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    }
+    const { email } = await request.json();
 
     if (!isNonEmptyString(email) || !EMAIL_PATTERN.test(email)) {
       return NextResponse.json({ error: "Valid email is required" }, { status: 400 });
     }
 
+    const trimmedEmail = email.trim();
+
     await notion.pages.create({
       parent: { database_id: databaseId },
       properties: {
-        Name: { title: [{ text: { content: name.trim() } }] },
-        Email: { rich_text: [{ text: { content: email.trim() } }] },
+        Name: { title: [{ text: { content: trimmedEmail } }] },
+        Email: { rich_text: [{ text: { content: trimmedEmail } }] },
       },
     });
 
