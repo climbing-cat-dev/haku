@@ -3,6 +3,40 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
+type SubmitStatus = "idle" | "loading" | "success" | "error";
+
+function useEmailSubmit(endpoint: string, body?: Record<string, string>) {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus("loading");
+    setErrorMsg("");
+
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: email.trim(), ...body }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Something went wrong");
+      }
+
+      setStatus("success");
+    } catch (err) {
+      setStatus("error");
+      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
+    }
+  };
+
+  return { email, setEmail, status, errorMsg, handleSubmit };
+}
+
 function ProjectCard({ href, image, title, description, subtitle, delay, onClick }: {
   href?: string;
   image?: string;
@@ -66,9 +100,7 @@ function ProjectCard({ href, image, title, description, subtitle, delay, onClick
 }
 
 function WaitlistModal({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const { email, setEmail, status, errorMsg, handleSubmit: submitEmail } = useEmailSubmit("/api/waitlist");
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -79,29 +111,15 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus("loading");
-    setErrorMsg("");
-
-    try {
-      const res = await fetch("/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email.trim() }),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Something went wrong");
-      }
-
-      setStatus("success");
-      setTimeout(onClose, 2000);
-    } catch (err) {
-      setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Something went wrong");
-    }
+    await submitEmail(e);
   };
+
+  useEffect(() => {
+    if (status === "success") {
+      const timer = setTimeout(onClose, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [status, onClose]);
 
   return (
     <div
@@ -163,6 +181,48 @@ function WaitlistModal({ onClose }: { onClose: () => void }) {
         )}
       </div>
     </div>
+  );
+}
+
+function MailingListForm() {
+  const { email, setEmail, status, errorMsg, handleSubmit } = useEmailSubmit("/api/mailing-list", { source: "Other" });
+
+  if (status === "success") {
+    return (
+      <div className="text-center">
+        <p className="text-[clamp(1.1rem,2.5vw,1.4rem)] font-light font-display text-accent">
+          You&apos;re subscribed
+        </p>
+        <p className="mt-2 text-[12px] font-light tracking-[0.05em] text-muted">
+          We&apos;ll keep you in the loop.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+      <input
+        type="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        required
+        className="flex-1 border border-border bg-transparent px-3 py-2 text-[13px] font-light tracking-[0.02em] text-foreground placeholder:text-muted/60 outline-none focus:border-accent transition-colors rounded-sm"
+      />
+      <button
+        type="submit"
+        disabled={status === "loading"}
+        className="border border-accent bg-accent text-white px-5 py-2 text-[12px] font-light tracking-[0.15em] uppercase transition-all hover:bg-transparent hover:text-accent disabled:opacity-50 cursor-pointer rounded-sm whitespace-nowrap"
+      >
+        {status === "loading" ? "..." : "Subscribe"}
+      </button>
+      {status === "error" && (
+        <p className="text-[11px] font-light tracking-[0.05em] text-red-500 sm:absolute sm:mt-12">
+          {errorMsg}
+        </p>
+      )}
+    </form>
   );
 }
 
@@ -292,6 +352,17 @@ export default function Home() {
             onClick={() => setShowWaitlist(true)}
           />
         </div>
+      </section>
+
+      {/* Mailing List */}
+      <section className="px-6 py-16 md:px-10 md:py-24 flex flex-col items-center text-center">
+        <h2 className="text-[clamp(1.5rem,4vw,2.5rem)] font-light tracking-[-0.02em] font-display mb-2">
+          Stay in the loop
+        </h2>
+        <p className="text-[12px] font-light tracking-[0.05em] text-muted mb-6 max-w-sm">
+          Sign up for updates on what we&apos;re building.
+        </p>
+        <MailingListForm />
       </section>
 
       {/* Divider */}
