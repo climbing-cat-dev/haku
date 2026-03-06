@@ -275,7 +275,7 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
           <ProjectCard
-            href="mailto:nate@climbingcat.dev"
+            href="mailto:nathan@climbingcat.dev"
             image="/climbing-cat.webp"
             title="Climbing Cat"
             description="An AI-native agency"
